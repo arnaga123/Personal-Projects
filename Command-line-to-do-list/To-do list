@@ -1,0 +1,98 @@
+""" ToDo App
+
+This command-line ToDo app helps you to manage tasks more efficiently.
+
+Features:
+- add a new task
+- delete a task
+- mark a task as completed
+- view all tasks
+- save tasks to a file 
+
+By: Arnav Agarwal
+Date: 04/27/2026 """
+
+Tasks = []
+
+def add_task():
+    task = input("Enter a task: ")
+    Tasks.append({'task': task, 'completed': False})
+    print("Task added successfully")
+
+def delete_task():
+    if len(Tasks) == 0:
+        print("No Tasks to delete!")
+    else:
+        print("Tasks")
+        for i, task in enumerate(Tasks):
+            status = "[DONE]" if task['completed'] else "[ ]"
+            print(f"{i + 1}. {status} {task['task']}")
+        choice = int(input("Enter the task number you want to delete: "))
+
+        if 0 < choice <= len(Tasks):
+            del Tasks[choice - 1]
+            print("Task deleted successfully")
+        else:
+            print("Invalid task number")
+
+def mark_completed():
+    if len(Tasks) == 0:
+        print("No tasks to mark as completed!")
+    else:
+        print("Tasks")
+        for i, task in enumerate(Tasks):
+            status = "[DONE]" if task['completed'] else "[ ]"
+            print(f"{i + 1}. {status} {task['task']}")
+        choice = int(input("Enter the task number you want to mark as completed: "))
+
+        if 0 < choice <= len(Tasks):
+            Tasks[choice - 1]['completed'] = True
+            print("Task marked as completed")
+        else:
+            print("Invalid task number")
+
+def view_tasks():
+    if len(Tasks) == 0:
+        print("No tasks!")
+    else:
+        print("List of Tasks: ")
+        for i, task in enumerate(Tasks):
+            status = "[DONE]" if task['completed'] else "[ ]"
+            print(f"{i + 1}. {status} {task['task']}")
+
+def save_tasks():
+    with open("tasks.txt", "w") as f:
+        for task in Tasks:
+            status = "DONE" if task['completed'] else "PENDING"
+            f.write(f"{status}: {task['task']}\n")
+    print("Tasks saved to tasks.txt")
+
+def main():
+    while True:
+        print("\n===== To-do-list =====")
+        print("1. Add Task")
+        print("2. View Task")
+        print("3. Delete Task")
+        print("4. Mark Task as Completed")
+        print("5. Save Tasks")
+        print("6. Quit")
+
+        choice = int(input("Enter your choice: "))
+        if choice == 1:
+            add_task()
+        elif choice == 2:
+            view_tasks()
+        elif choice == 3:
+            delete_task()
+        elif choice == 4:
+            mark_completed()
+        elif choice == 5:
+            save_tasks()
+        elif choice == 6:
+            print("Thank you for using the to-do-list")
+            break
+        else:
+            print("Invalid choice please try again ")
+
+if __name__ == "__main__":
+    main()
