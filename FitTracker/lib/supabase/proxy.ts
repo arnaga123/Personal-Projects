@@ -6,6 +6,7 @@ const PROTECTED_PREFIXES = [
   "/log",
   "/splits",
   "/exercises",
+  "/learn",
   "/progress",
   "/settings",
   "/onboarding",

@@ -1,4 +1,5 @@
 import {
+  BookOpen,
   CalendarDays,
   Dumbbell,
   Gauge,
@@ -15,6 +16,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/log", label: "Log", icon: PlusSquare },
   { href: "/splits", label: "Splits", icon: CalendarDays },
   { href: "/exercises", label: "Exercises", icon: Dumbbell },
+  { href: "/learn", label: "Learn", icon: BookOpen },
   { href: "/progress", label: "Progress", icon: TrendingUp },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
