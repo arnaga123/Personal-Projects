@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { updateProfile } from "@/app/actions/profile";
 import { Field } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,6 @@ type Profile = {
 
 export function ProfileForm({ profile }: { profile: Profile }) {
   const [state, action, pending] = useActionState(updateProfile, undefined);
-  const [goal, setGoal] = useState(profile?.goal ?? "maintain");
-  const [experienceLevel, setExperienceLevel] = useState(profile?.experience_level ?? "beginner");
 
   return (
     <form action={action} className="flex max-w-lg flex-col gap-5">
@@ -25,8 +23,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <span className="text-xs font-semibold uppercase tracking-wide text-muted">Goal</span>
         <select
           name="goal"
-          value={goal}
-          onChange={(e) => setGoal(e.target.value)}
+          defaultValue={profile?.goal ?? "maintain"}
           className="border border-border bg-surface px-3.5 py-2.5 text-sm focus:border-accent focus:outline-none"
         >
           <option value="bulk">Bulk</option>
@@ -41,8 +38,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         </span>
         <select
           name="experienceLevel"
-          value={experienceLevel}
-          onChange={(e) => setExperienceLevel(e.target.value)}
+          defaultValue={profile?.experience_level ?? "beginner"}
           className="border border-border bg-surface px-3.5 py-2.5 text-sm focus:border-accent focus:outline-none"
         >
           <option value="beginner">Beginner</option>

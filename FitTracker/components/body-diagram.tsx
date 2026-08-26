@@ -2,27 +2,63 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useAnimations, useGLTF } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import { SkeletonUtils } from "three-stdlib";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { MuscleGroup } from "@/lib/muscle-groups";
 import { SPECIFIC_MUSCLE_BROAD_GROUP, SPECIFIC_MUSCLE_LABELS, type SpecificMuscle } from "@/lib/specific-muscles";
 
-const HOLO_BASE = "#5fc6ff";
+// Natural muscle-tissue red as the base tone (not a highlighted muscle) so the
+// figure reads as anatomy rather than a flat-colored hologram; each muscle
+// gets a small deterministic jitter off this base so adjacent, independently
+// -modeled muscles stay visually distinguishable even when neither is
+// highlighted — exactly what was missing before ("properly see every muscle").
+const MUSCLE_BASE = "#a8483d";
+const BONE_COLOR = "#e2d6bd";
+const OUTLINE_COLOR = "#170a08";
 const PRIMARY = "#c6ff3a";
-const SECONDARY = "#9be15c";
-const BG = "#050c18";
+const SECONDARY = "#5fbf3a";
+const BG = "#0b0a09";
 
-const INITIAL_CAMERA_POSITION: [number, number, number] = [1.1, 1.05, 2.6];
-const ORBIT_TARGET: [number, number, number] = [0, 0.95, 0];
+// Tuned for the full head-to-feet figure (~1.64m tall after adding neck and
+// foot anatomy) at fov=30: target sits at mid-height, and the camera is far
+// enough back that the head and feet both stay inside the frame with margin.
+const INITIAL_CAMERA_POSITION: [number, number, number] = [1.44, 0.93, -3.2];
+const ORBIT_TARGET: [number, number, number] = [0, 0.82, 0];
 
-useGLTF.preload("/models/xbot.glb");
-
-const HOLO_BASE_COLOR = new THREE.Color(HOLO_BASE);
 const PRIMARY_COLOR = new THREE.Color(PRIMARY);
 const SECONDARY_COLOR = new THREE.Color(SECONDARY);
+const MUSCLE_BASE_HSL = new THREE.Color(MUSCLE_BASE).getHSL({ h: 0, s: 0, l: 0 });
+
+// Small per-broad-group hue shifts (still within the muscle-tissue red/brown
+// family, not a rainbow) so a whole region reads as visually distinct at a
+// glance — e.g. the back is noticeably warmer/browner than the chest — on
+// top of the per-muscle lightness jitter that separates individual muscles
+// within a region.
+const BROAD_HUE_OFFSET: Record<MuscleGroup, number> = {
+  chest: 0,
+  shoulders: 0.025,
+  arms: -0.03,
+  back: 0.05,
+  core: -0.05,
+  legs: 0.075,
+};
+
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (Math.imul(h, 31) + s.charCodeAt(i)) | 0;
+  return (h >>> 0) / 4294967295;
+}
+
+function baseColorFor(id: string, muscle: SpecificMuscle | null): THREE.Color {
+  const broad = muscle ? SPECIFIC_MUSCLE_BROAD_GROUP[muscle] : undefined;
+  const groupHueOffset = broad ? (BROAD_HUE_OFFSET[broad] ?? 0) : 0;
+  const t = hashString(id);
+  const lightness = MUSCLE_BASE_HSL.l + (t - 0.5) * 0.28;
+  const hue = (((MUSCLE_BASE_HSL.h + groupHueOffset + (t - 0.5) * 0.02) % 1) + 1) % 1;
+  return new THREE.Color().setHSL(hue, MUSCLE_BASE_HSL.s, Math.min(0.7, Math.max(0.16, lightness)));
+}
 
 type Region = SpecificMuscle | "neutral";
 
@@ -32,187 +68,209 @@ type Region = SpecificMuscle | "neutral";
 // specific muscle against its broad muscle group, reproducing the old
 // whole-region highlight for exercises that haven't been tagged yet.
 function regionColor(
+  id: string,
   region: Region,
   primary: MuscleGroup,
   secondary: MuscleGroup[],
   specificMuscle?: SpecificMuscle,
   specificSecondaryMuscles?: SpecificMuscle[]
 ): THREE.Color {
-  if (region === "neutral") return HOLO_BASE_COLOR;
+  if (region === "neutral") return baseColorFor(id, null);
   if (specificMuscle) {
     if (region === specificMuscle) return PRIMARY_COLOR;
     if (specificSecondaryMuscles?.includes(region)) return SECONDARY_COLOR;
-    return HOLO_BASE_COLOR;
+    return baseColorFor(id, region);
   }
   const broad = SPECIFIC_MUSCLE_BROAD_GROUP[region];
   if (broad === primary) return PRIMARY_COLOR;
   if (secondary.includes(broad)) return SECONDARY_COLOR;
-  return HOLO_BASE_COLOR;
+  return baseColorFor(id, region);
 }
 
-// Vertex Z sign convention (confirmed empirically against this rig): negative
-// Z is the character's front, positive Z is the back.
-const FRONT_Z = -0.01;
-const BACK_Z = 0.01;
+// One real anatomical piece (muscle or bone), sliced directly out of the
+// shared binary blob (no per-vertex copy until render time).
+type MuscleEntry = {
+  id: string;
+  kind: "muscle" | "bone";
+  muscle: SpecificMuscle | null;
+  side: "L" | "R";
+  positions: Float32Array;
+  indices: Uint32Array;
+};
 
-// Classifies every vertex of a skinned mesh into a specific muscle by its
-// dominant bone weight, refined with the vertex's own bind-pose position:
-// front/back (Z) splits anterior from posterior muscles sharing one bone
-// (e.g. biceps vs. triceps both ride the upper-arm bone), and — for the
-// upper arm and forearm — how far along the bone's own vertex span a vertex
-// sits (found from the neighboring bones' mean X, since a bone's own matrix
-// isn't a reliable "shoulder" or "elbow" landmark on this rig) separates
-// biceps from the more distal brachialis, and isolates brachioradialis at
-// the proximal forearm.
-function classifyVertices(mesh: THREE.SkinnedMesh): Region[] {
-  const geo = mesh.geometry;
-  const pos = geo.attributes.position;
-  const skinIndex = geo.attributes.skinIndex;
-  const skinWeight = geo.attributes.skinWeight;
-  const bones = mesh.skeleton.bones;
-  const count = pos.count;
-  const regions: Region[] = new Array(count).fill("neutral");
-  if (!skinIndex || !skinWeight) return regions;
+type Manifest = {
+  scale: number;
+  muscles: {
+    id: string;
+    kind: "muscle" | "bone";
+    muscle: SpecificMuscle | null;
+    side: "L" | "R";
+    posOffset: number;
+    posLength: number;
+    idxOffset: number;
+    idxLength: number;
+  }[];
+};
 
-  const boneNameOf: string[] = new Array(count);
-  let minY = Infinity;
-  let maxY = -Infinity;
-  const xSum: Record<string, { sum: number; n: number }> = {};
+function useMuscleData() {
+  const [entries, setEntries] = useState<MuscleEntry[] | null>(null);
 
-  for (let i = 0; i < count; i++) {
-    const idxs = [skinIndex.getX(i), skinIndex.getY(i), skinIndex.getZ(i), skinIndex.getW(i)];
-    const wts = [skinWeight.getX(i), skinWeight.getY(i), skinWeight.getZ(i), skinWeight.getW(i)];
-    let bestIdx = idxs[0];
-    let bestWeight = wts[0];
-    for (let k = 1; k < 4; k++) {
-      if (wts[k] > bestWeight) {
-        bestWeight = wts[k];
-        bestIdx = idxs[k];
-      }
-    }
-    const bone = bones[bestIdx];
-    const name = bone ? bone.name.replace(/^mixamorig:?/i, "") : "";
-    boneNameOf[i] = name;
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [manifest, binBuf] = await Promise.all([
+        fetch("/models/muscles-manifest.json").then((r) => r.json() as Promise<Manifest>),
+        fetch("/models/muscles.bin").then((r) => r.arrayBuffer()),
+      ]);
+      if (cancelled) return;
+      const parsed = manifest.muscles.map((m) => ({
+        id: m.id,
+        kind: m.kind,
+        muscle: m.muscle,
+        side: m.side,
+        positions: new Float32Array(binBuf, m.posOffset, m.posLength),
+        indices: new Uint32Array(binBuf, m.idxOffset, m.idxLength),
+      }));
+      setEntries(parsed);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-    const y = pos.getY(i);
-    if (y < minY) minY = y;
-    if (y > maxY) maxY = y;
-
-    if (name) {
-      const s = (xSum[name] ??= { sum: 0, n: 0 });
-      s.sum += pos.getX(i);
-      s.n += 1;
-    }
-  }
-  const totalHeight = Math.max(maxY - minY, 1e-6);
-  const meanX = (name: string, fallback: number) => (xSum[name] ? xSum[name].sum / xSum[name].n : fallback);
-
-  function armMuscle(side: "Left" | "Right", i: number): SpecificMuscle {
-    const x = pos.getX(i);
-    const shoulderX = meanX(`${side}Shoulder`, x);
-    const elbowX = meanX(`${side}ForeArm`, x);
-    const span = elbowX - shoulderX;
-    const t = span !== 0 ? (x - shoulderX) / span : 0.5;
-    // The "Beta_Joints" mesh's shoulder-ball geometry is dominantly weighted
-    // to the upper-arm bone rather than the shoulder bone, so without this
-    // its most proximal sliver would read as biceps/triceps instead of
-    // deltoid — the deltoid cap does anatomically wrap over that insertion.
-    if (t < 0.15) return shoulderMuscle(i);
-    if (pos.getZ(i) > BACK_Z) return "triceps_brachii";
-    return t > 0.55 ? "brachialis" : "biceps_brachii";
-  }
-
-  function forearmMuscle(side: "Left" | "Right", i: number): Region {
-    const x = pos.getX(i);
-    const elbowX = meanX(`${side}Arm`, x);
-    const wristX = meanX(`${side}Hand`, x);
-    const span = wristX - elbowX;
-    const t = span !== 0 ? (x - elbowX) / span : 0.5;
-    return t < 0.4 ? "brachioradialis" : "neutral";
-  }
-
-  function shoulderMuscle(i: number): SpecificMuscle {
-    const z = pos.getZ(i);
-    if (z < FRONT_Z) return "anterior_deltoid";
-    if (z > BACK_Z) return "posterior_deltoid";
-    return "lateral_deltoid";
-  }
-
-  function torsoMuscle(name: string, i: number): Region {
-    const relY = (pos.getY(i) - minY) / totalHeight;
-    const z = pos.getZ(i);
-    if (z < FRONT_Z) {
-      if (name === "Hips" && relY < 0.15) return "neutral"; // groin
-      if (relY > 0.78) return "upper_pectoralis";
-      if (relY > 0.55) return "lower_pectoralis";
-      return Math.abs(pos.getX(i)) > 0.09 ? "obliques" : "rectus_abdominis";
-    }
-    if (z > BACK_Z) {
-      if (name === "Hips") return "gluteus_maximus";
-      return relY > 0.75 ? "trapezius" : "latissimus_dorsi";
-    }
-    return "neutral";
-  }
-
-  for (let i = 0; i < count; i++) {
-    const name = boneNameOf[i];
-    if (name.startsWith("LeftHand") || name.startsWith("RightHand")) continue; // fingers stay neutral
-    switch (name) {
-      case "LeftArm":
-        regions[i] = armMuscle("Left", i);
-        continue;
-      case "RightArm":
-        regions[i] = armMuscle("Right", i);
-        continue;
-      case "LeftForeArm":
-        regions[i] = forearmMuscle("Left", i);
-        continue;
-      case "RightForeArm":
-        regions[i] = forearmMuscle("Right", i);
-        continue;
-      case "LeftShoulder":
-      case "RightShoulder":
-        regions[i] = shoulderMuscle(i);
-        continue;
-      case "LeftUpLeg":
-      case "RightUpLeg":
-        regions[i] = pos.getZ(i) < 0 ? "quadriceps" : "hamstrings";
-        continue;
-      case "LeftLeg":
-      case "RightLeg":
-        regions[i] = "gastrocnemius";
-        continue;
-    }
-    if (name.startsWith("Spine") || name === "Hips") {
-      regions[i] = torsoMuscle(name, i);
-    }
-  }
-  return regions;
+  return entries;
 }
 
-function applyRegionColors(
-  mesh: THREE.SkinnedMesh,
-  regions: Region[],
-  primary: MuscleGroup,
-  secondary: MuscleGroup[],
-  specificMuscle?: SpecificMuscle,
-  specificSecondaryMuscles?: SpecificMuscle[]
-) {
-  const count = regions.length;
-  const colors = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    const c = regionColor(regions[i], primary, secondary, specificMuscle, specificSecondaryMuscles);
-    colors[i * 3] = c.r;
-    colors[i * 3 + 1] = c.g;
-    colors[i * 3 + 2] = c.b;
-  }
-  const attr = mesh.geometry.getAttribute("color") as THREE.BufferAttribute | undefined;
-  if (attr && attr.array.length === colors.length) {
-    (attr.array as Float32Array).set(colors);
-    attr.needsUpdate = true;
-  } else {
-    mesh.geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-  }
+// A dark, slightly-enlarged backface-only shell behind each piece — the
+// standard "toon outline" trick, and the main way individual muscles read as
+// distinct pieces at a glance rather than relying on color alone.
+//
+// This stays non-depth-writing so it can never permanently claim a pixel —
+// it only shows through wherever nothing else has drawn something closer
+// there. Fills, by contrast, are transparent (~0.94-0.99 opacity) but DO
+// write depth: with ~100 independently-modeled anatomical pieces puffed
+// outward to close seams, they overlap each other substantially, and true
+// full-opacity rendering exposed real gaps between pieces as solid black
+// (blending across the overlap had been quietly hiding those). Letting
+// fills write depth while keeping the blend gives a real z-buffer for
+// stability — no more per-frame flicker from three.js re-sorting transparent
+// draw order by camera distance — while the residual blending still papers
+// over the gaps. (A fixed manifest-index-based renderOrder was tried first
+// instead of touching depth at all; with no depth write anywhere, that just
+// replaced "flickers over time" with "whichever mesh has the higher fixed
+// index always wins," visible as static, wrong-looking color takeovers.)
+//
+// The shell is built by pushing each vertex out along its own normal by a
+// small constant world-space distance, not by scaling the whole mesh from
+// its centroid. Centroid scaling moves a vertex by an amount proportional to
+// its distance from the centroid — fine for a small round shape, but for a
+// long piece (a trapezius, a torso bone) the far ends shift by far more than
+// a "thin rim" and balloon straight through neighboring, anatomically-
+// touching pieces, which is what caused large wrong-colored/black patches
+// across the torso regardless of how transparency/depth were configured.
+const OUTLINE_THICKNESS = 0.0025;
+
+function useOutlineGeometry(geometry: THREE.BufferGeometry) {
+  return useMemo(() => {
+    const pos = geometry.attributes.position;
+    const norm = geometry.attributes.normal;
+    const outPos = new Float32Array(pos.count * 3);
+    for (let i = 0; i < pos.count; i++) {
+      outPos[i * 3] = pos.getX(i) + norm.getX(i) * OUTLINE_THICKNESS;
+      outPos[i * 3 + 1] = pos.getY(i) + norm.getY(i) * OUTLINE_THICKNESS;
+      outPos[i * 3 + 2] = pos.getZ(i) + norm.getZ(i) * OUTLINE_THICKNESS;
+    }
+    const outGeo = new THREE.BufferGeometry();
+    outGeo.setAttribute("position", new THREE.BufferAttribute(outPos, 3));
+    outGeo.setIndex(geometry.index);
+    return outGeo;
+  }, [geometry]);
+}
+
+function Outline({ geometry }: { geometry: THREE.BufferGeometry }) {
+  const outlineGeometry = useOutlineGeometry(geometry);
+  return (
+    <mesh geometry={outlineGeometry}>
+      <meshBasicMaterial color={OUTLINE_COLOR} side={THREE.BackSide} transparent depthWrite={false} />
+    </mesh>
+  );
+}
+
+function useEntryGeometry(entry: MuscleEntry) {
+  return useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(entry.positions, 3));
+    geo.setIndex(new THREE.BufferAttribute(entry.indices, 1));
+    geo.computeVertexNormals();
+    return geo;
+  }, [entry]);
+}
+
+function BoneMesh({ entry }: { entry: MuscleEntry }) {
+  const geometry = useEntryGeometry(entry);
+  return (
+    <>
+      <Outline geometry={geometry} />
+      <mesh geometry={geometry}>
+        <meshStandardMaterial
+          color={BONE_COLOR}
+          roughness={0.55}
+          metalness={0}
+          transparent
+          opacity={0.97}
+          depthWrite
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+    </>
+  );
+}
+
+function MuscleMesh({
+  entry,
+  primary,
+  secondary,
+  specificMuscle,
+  specificSecondaryMuscles,
+}: {
+  entry: MuscleEntry;
+  primary: MuscleGroup;
+  secondary: MuscleGroup[];
+  specificMuscle?: SpecificMuscle;
+  specificSecondaryMuscles?: SpecificMuscle[];
+}) {
+  const geometry = useEntryGeometry(entry);
+  // Untracked pieces (e.g. neck muscles with no SpecificMuscle mapping) are
+  // always rendered as plain, never-highlighted anatomy.
+  const region: Region = entry.muscle ?? "neutral";
+
+  const color = regionColor(entry.id, region, primary, secondary, specificMuscle, specificSecondaryMuscles);
+  const highlighted =
+    entry.muscle === null
+      ? false
+      : specificMuscle
+        ? entry.muscle === specificMuscle || !!specificSecondaryMuscles?.includes(entry.muscle)
+        : SPECIFIC_MUSCLE_BROAD_GROUP[entry.muscle] === primary ||
+          secondary.includes(SPECIFIC_MUSCLE_BROAD_GROUP[entry.muscle]);
+
+  return (
+    <>
+      <Outline geometry={geometry} />
+      <mesh geometry={geometry}>
+        <meshStandardMaterial
+          color={color}
+          emissive={highlighted ? color : "#000000"}
+          emissiveIntensity={highlighted ? 0.55 : 0}
+          transparent
+          opacity={highlighted ? 0.99 : 0.94}
+          roughness={0.65}
+          metalness={0}
+          depthWrite
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+    </>
+  );
 }
 
 function Figure({
@@ -226,57 +284,25 @@ function Figure({
   specificMuscle?: SpecificMuscle;
   specificSecondaryMuscles?: SpecificMuscle[];
 }) {
-  const { scene, animations } = useGLTF("/models/xbot.glb");
-  const cloned = useMemo(() => SkeletonUtils.clone(scene) as THREE.Object3D, [scene]);
-  const { actions, mixer } = useAnimations(animations, cloned);
-
-  const skinnedMeshes = useMemo(() => {
-    const meshes: THREE.SkinnedMesh[] = [];
-    cloned.traverse((obj) => {
-      if ((obj as THREE.SkinnedMesh).isSkinnedMesh) meshes.push(obj as THREE.SkinnedMesh);
-    });
-    return meshes;
-  }, [cloned]);
-
-  const regionsByMesh = useMemo(() => skinnedMeshes.map((mesh) => classifyVertices(mesh)), [skinnedMeshes]);
-
-  useEffect(() => {
-    const action = actions.sad_pose;
-    if (!action) return;
-    // drei's useAnimations calls mixer.update() every frame regardless, so a
-    // playing action loops forever — this clip is ~0.07s long, which without
-    // pausing caused a rapid, visible twitch. Freeze it on one static frame.
-    action.reset().play();
-    // Imperative three.js AnimationAction state, not React render state.
-    // eslint-disable-next-line react-hooks/immutability
-    action.time = 0.03;
-    action.paused = true;
-    mixer.update(0);
-  }, [actions, mixer]);
-
-  useEffect(() => {
-    skinnedMeshes.forEach((mesh) => {
-      mesh.material = new THREE.MeshStandardMaterial({
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.96,
-        roughness: 0.4,
-        metalness: 0.05,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-      });
-    });
-  }, [skinnedMeshes]);
-
-  useEffect(() => {
-    skinnedMeshes.forEach((mesh, i) => {
-      applyRegionColors(mesh, regionsByMesh[i], primary, secondary, specificMuscle, specificSecondaryMuscles);
-    });
-  }, [skinnedMeshes, regionsByMesh, primary, secondary, specificMuscle, specificSecondaryMuscles]);
+  const entries = useMuscleData();
+  if (!entries) return null;
 
   return (
-    <group rotation={[0, Math.PI, 0]}>
-      <primitive object={cloned} />
+    <group>
+      {entries.map((entry) =>
+        entry.kind === "bone" ? (
+          <BoneMesh key={entry.id} entry={entry} />
+        ) : (
+          <MuscleMesh
+            key={entry.id}
+            entry={entry}
+            primary={primary}
+            secondary={secondary}
+            specificMuscle={specificMuscle}
+            specificSecondaryMuscles={specificSecondaryMuscles}
+          />
+        )
+      )}
     </group>
   );
 }
@@ -291,7 +317,7 @@ function Rig({ view, onArrived }: { view: "front" | "back" | null; onArrived: ()
     const dz = camera.position.z - target.z;
     const radius = Math.hypot(dx, dz);
     const currentTheta = Math.atan2(dx, dz);
-    const targetTheta = view === "front" ? 0 : Math.PI;
+    const targetTheta = view === "front" ? Math.PI : 0;
     let delta = targetTheta - currentTheta;
     delta = Math.atan2(Math.sin(delta), Math.cos(delta));
     if (Math.abs(delta) < 0.01) {
@@ -337,8 +363,8 @@ function Scene({ primary, secondary, specificMuscle, specificSecondaryMuscles, v
         enablePan={false}
         enableDamping
         dampingFactor={0.08}
-        minDistance={1.2}
-        maxDistance={4}
+        minDistance={0.8}
+        maxDistance={10}
         minPolarAngle={Math.PI / 5}
         maxPolarAngle={Math.PI / 1.9}
       />
@@ -415,7 +441,7 @@ export function BodyDiagram({
           <span className="h-2.5 w-2.5 shrink-0" style={{ backgroundColor: SECONDARY }} /> {secondaryLabel}
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5" style={{ backgroundColor: HOLO_BASE }} /> Not worked
+          <span className="h-2.5 w-2.5" style={{ backgroundColor: MUSCLE_BASE }} /> Not worked
         </span>
       </div>
     </div>

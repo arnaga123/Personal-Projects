@@ -50,6 +50,13 @@ export default async function ExerciseDetailPage({ params }: { params: Promise<{
             </p>
           </div>
 
+          {exercise.why_effective && (
+            <div className="border border-border bg-surface p-6">
+              <h2 className="font-display text-lg font-medium">Why it&apos;s effective</h2>
+              <p className="mt-3 text-sm text-muted">{exercise.why_effective}</p>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div className="border border-border bg-surface p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Primary muscle</p>
@@ -60,6 +67,10 @@ export default async function ExerciseDetailPage({ params }: { params: Promise<{
               <p className="mt-2 font-display text-xl font-medium">
                 {exercise.rest_seconds ? formatRest(exercise.rest_seconds) : "—"}
               </p>
+            </div>
+            <div className="border border-border bg-surface p-5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">Equipment needed</p>
+              <p className="mt-2 font-display text-xl font-medium">{exercise.equipment ?? "None"}</p>
             </div>
           </div>
 
