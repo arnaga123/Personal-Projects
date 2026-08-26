@@ -14,14 +14,16 @@ import { SPECIFIC_MUSCLE_BROAD_GROUP, SPECIFIC_MUSCLE_LABELS, type SpecificMuscl
 // muscle gets a small deterministic jitter off this base so adjacent,
 // independently-modeled muscles stay visually distinguishable as shapes
 // even when neither is highlighted.
-const MUSCLE_BASE = "#8c8a86";
+// A bit darker than before so the highlight red has more to contrast
+// against — the highlight itself wasn't the only thing that needed to pop
+// harder, a lighter grey body was eating into that contrast too.
+const MUSCLE_BASE = "#726f6a";
 const BONE_COLOR = "#e2d6bd";
-// Bright, saturated red for the exercise's primary muscle, with a lighter
-// pink-red for secondary muscles — both read clearly against the grey body
-// without needing an outline or boundary line to separate "targeted" from
-// "not targeted."
-const PRIMARY = "#e0261c";
-const SECONDARY = "#f0897d";
+// More saturated and a shade brighter than before — the previous red/pink
+// pair was legible up close but too easily lost against the grey body at a
+// normal glance.
+const PRIMARY = "#ff2114";
+const SECONDARY = "#ff8f76";
 const BG = "#0b0a09";
 
 // Tuned for the full head-to-feet figure (~1.64m tall after adding neck and
@@ -81,9 +83,15 @@ function baseColorFor(id: string, muscle: SpecificMuscle | null): THREE.Color {
 // swatch with zero variation between them, which reads as "no texture"
 // regardless of how good the lighting is. This gives highlighted pieces the
 // same kind of per-piece shade jitter baseColorFor gives unworked ones.
+// Jitter only ever brightens (never darkens) relative to the base lightness:
+// symmetric jitter here was occasionally landing a highlighted piece
+// noticeably darker than PRIMARY/SECONDARY's own lightness, which is exactly
+// what made it hard to spot against the grey body. This keeps every
+// highlighted piece at least as bright as the base color, with a bit of
+// variety added on top instead of subtracted.
 function jitteredColor(id: string, hsl: { h: number; s: number; l: number }, spread: number): THREE.Color {
   const t = hashString(id);
-  const lightness = Math.min(1, Math.max(0, hsl.l + (t - 0.5) * spread));
+  const lightness = Math.min(1, hsl.l + t * spread);
   return new THREE.Color().setHSL(hsl.h, hsl.s, lightness);
 }
 
@@ -104,13 +112,13 @@ function regionColor(
 ): THREE.Color {
   if (region === "neutral") return baseColorFor(id, null);
   if (specificMuscle) {
-    if (region === specificMuscle) return jitteredColor(id, PRIMARY_HSL, 0.14);
-    if (specificSecondaryMuscles?.includes(region)) return jitteredColor(id, SECONDARY_HSL, 0.14);
+    if (region === specificMuscle) return jitteredColor(id, PRIMARY_HSL, 0.1);
+    if (specificSecondaryMuscles?.includes(region)) return jitteredColor(id, SECONDARY_HSL, 0.1);
     return baseColorFor(id, region);
   }
   const broad = SPECIFIC_MUSCLE_BROAD_GROUP[region];
-  if (broad === primary) return jitteredColor(id, PRIMARY_HSL, 0.14);
-  if (secondary.includes(broad)) return jitteredColor(id, SECONDARY_HSL, 0.14);
+  if (broad === primary) return jitteredColor(id, PRIMARY_HSL, 0.1);
+  if (secondary.includes(broad)) return jitteredColor(id, SECONDARY_HSL, 0.1);
   return baseColorFor(id, region);
 }
 
@@ -291,19 +299,17 @@ function MuscleMesh({
         onSelectPoint(e.point);
       }}
     >
-      {/* No emissive boost for highlighted pieces: 0.6 was strong enough to
-          wash out the diffuse light/shadow gradient entirely, so a
-          highlighted muscle read as a flat, textureless red shape instead
-          of a real one — exactly the opposite of what "more prominent"
-          meant. The red-vs-grey color contrast is already the signal;
-          emissive was fighting the same shading that makes any muscle read
-          as a muscle. A small nudge (not full replacement) keeps the
-          highlight legible even on a piece's shadowed side without
-          flattening the rest of it. */}
+      {/* 0.6 washed out the diffuse shading entirely (a highlighted muscle
+          read as flat/textureless); 0.12 swung too far the other way and
+          made the highlight easy to lose against the grey body once a
+          piece's own shading dipped. 0.25 is the middle: a floor under how
+          dark a highlighted piece's shadow side can get, without
+          overpowering the light/shadow gradient the rest of the fix relies
+          on for showing shape. */}
       <meshLambertMaterial
         color={color}
         emissive={highlighted ? color : "#000000"}
-        emissiveIntensity={highlighted ? 0.12 : 0}
+        emissiveIntensity={highlighted ? 0.25 : 0}
         side={THREE.DoubleSide}
       />
     </mesh>
