@@ -50,6 +50,20 @@ export default async function ExerciseDetailPage({ params }: { params: Promise<{
             </p>
           </div>
 
+          {exercise.common_mistakes && (
+            <div className="border border-danger/40 bg-surface p-6">
+              <h2 className="font-display text-lg font-medium text-danger">Common mistakes to avoid</h2>
+              <p className="mt-3 text-sm text-muted">{exercise.common_mistakes}</p>
+            </div>
+          )}
+
+          {exercise.beginner_tips && (
+            <div className="border border-border bg-surface p-6">
+              <h2 className="font-display text-lg font-medium">Tips if you&apos;re new to this</h2>
+              <p className="mt-3 text-sm text-muted">{exercise.beginner_tips}</p>
+            </div>
+          )}
+
           {exercise.why_effective && (
             <div className="border border-border bg-surface p-6">
               <h2 className="font-display text-lg font-medium">Why it&apos;s effective</h2>
