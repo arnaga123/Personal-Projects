@@ -4,6 +4,7 @@ import { verifySession } from "@/lib/dal";
 import { logout } from "@/app/actions/auth";
 import { NavLink } from "@/components/nav-link";
 import { MobileNav } from "@/components/mobile-nav";
+import { ProductTour } from "@/components/product-tour";
 import { NAV_ITEMS } from "@/lib/nav";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -37,6 +38,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <MobileNav />
         <main className="mx-auto max-w-6xl px-6 py-8 md:px-10 md:py-10">{children}</main>
       </div>
+      <ProductTour />
     </div>
   );
 }

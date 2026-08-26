@@ -1,6 +1,7 @@
 import { verifySession } from "@/lib/dal";
 import { getProfile } from "@/lib/data/profile";
 import { ProfileForm } from "@/components/profile-form";
+import { ReplayTourButton } from "@/components/replay-tour-button";
 
 export default async function SettingsPage() {
   const user = await verifySession();
@@ -13,6 +14,9 @@ export default async function SettingsPage() {
         <h1 className="mt-1 font-display text-3xl font-medium">Your profile</h1>
       </div>
       <ProfileForm profile={profile} />
+      <div className="border-t border-border pt-6">
+        <ReplayTourButton />
+      </div>
     </div>
   );
 }

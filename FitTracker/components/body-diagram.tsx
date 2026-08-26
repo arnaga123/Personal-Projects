@@ -445,8 +445,16 @@ function Scene({ primary, secondary, specificMuscle, specificSecondaryMuscles, v
           curve, an eye socket) gets drowned out. Directional now does most
           of the work; ambient only keeps the shadowed side from going
           fully black. */}
+      {/* z was +3 — the same side as the *back* of the figure, since the
+          default "front" camera sits at z=-3.2 (INITIAL_CAMERA_POSITION).
+          Every front-facing surface (the chest, the abs) was on the light's
+          shadow side the whole time, getting only the flat ambient fill —
+          exactly why chest striations and ab definition read as flat no
+          matter how the material or smoothing was tuned. Moving it to -3
+          puts it on the same side as the view users actually land on by
+          default. */}
       <ambientLight intensity={0.7} />
-      <directionalLight position={[2, 4, 3]} intensity={1} />
+      <directionalLight position={[2, 4, -3]} intensity={1} />
 
       <Suspense fallback={null}>
         <Figure

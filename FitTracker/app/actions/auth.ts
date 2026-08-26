@@ -49,7 +49,7 @@ export async function signup(_state: AuthState, formData: FormData): Promise<Aut
     return { error: error.message };
   }
 
-  redirect("/dashboard");
+  redirect("/onboarding");
 }
 
 export async function logout() {

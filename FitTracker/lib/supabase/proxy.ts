@@ -8,6 +8,7 @@ const PROTECTED_PREFIXES = [
   "/exercises",
   "/progress",
   "/settings",
+  "/onboarding",
 ];
 
 export async function updateSession(request: NextRequest) {
@@ -43,6 +44,7 @@ export async function updateSession(request: NextRequest) {
     path === prefix || path.startsWith(`${prefix}/`);
   const isProtected = PROTECTED_PREFIXES.some(matchesPrefix);
   const isAuthPage = matchesPrefix("/login") || matchesPrefix("/signup");
+  const isOnboarding = matchesPrefix("/onboarding");
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
@@ -54,6 +56,30 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
+  }
+
+  // Gate the rest of the app behind the first-run onboarding questions
+  // (goal, experience level, training days/week) so every new signup lands
+  // there before anything else — and skip back to the app once it's done,
+  // so the questions don't linger as a page you can revisit at will.
+  if (isProtected && user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("onboarding_completed_at")
+      .eq("id", user.id)
+      .single();
+    const onboarded = !!profile?.onboarding_completed_at;
+
+    if (!onboarded && !isOnboarding) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/onboarding";
+      return NextResponse.redirect(url);
+    }
+    if (onboarded && isOnboarding) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
   }
 
   return response;

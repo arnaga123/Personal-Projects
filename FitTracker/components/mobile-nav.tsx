@@ -16,6 +16,7 @@ export function MobileNav() {
           <Link
             key={href}
             href={href}
+            data-tour={href.slice(1)}
             className={cn(
               "flex shrink-0 items-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide",
               active ? "text-accent" : "text-muted"
