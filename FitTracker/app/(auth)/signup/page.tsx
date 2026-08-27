@@ -16,8 +16,19 @@ export default function SignupPage() {
       <form action={action} className="mt-8 flex flex-col gap-5">
         <Field label="Name" name="name" required autoComplete="name" />
         <Field label="Email" name="email" type="email" required autoComplete="email" />
-        <Field label="Password" name="password" type="password" required autoComplete="new-password" />
+        <div className="flex flex-col gap-1.5">
+          <Field
+            label="Password"
+            name="password"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+          />
+          <span className="text-xs text-muted">At least 8 characters.</span>
+        </div>
         {state?.error && <p className="text-sm text-danger">{state.error}</p>}
+        {state?.info && <p className="text-sm text-accent">{state.info}</p>}
         <Button type="submit" disabled={pending} className="mt-2">
           {pending ? "Creating account..." : "Sign up"}
         </Button>

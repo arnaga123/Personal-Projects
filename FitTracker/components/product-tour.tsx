@@ -2,21 +2,34 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { NAV_ITEMS } from "@/lib/nav";
 
 export const TOUR_SEEN_KEY = "fittracker-tour-seen";
 
-const STEPS = [
-  { key: "dashboard", title: "Dashboard", description: "Your home base — see today's stats and recent activity at a glance." },
-  { key: "log", title: "Log", description: "Record today's sets, reps, and weight as you train." },
-  { key: "splits", title: "Splits", description: "Build and manage the weekly training split you follow." },
-  {
-    key: "exercises",
-    title: "Exercises",
-    description: "Browse the exercise library — each one has a 3D muscle diagram showing exactly what it targets.",
-  },
-  { key: "progress", title: "Progress", description: "Track your strength and volume over time." },
-  { key: "settings", title: "Settings", description: "Update your goal, experience level, and preferred training days." },
-] as const;
+// Keyed by href (minus the leading slash, matching data-tour) rather than a
+// hand-copied list of every nav item: a hard-coded step list is exactly what
+// went stale last time — "Learn" was added to NAV_ITEMS in a later commit
+// and nobody updated this file, so the tour silently stopped covering every
+// section. Deriving steps from NAV_ITEMS below means adding or removing a
+// nav item can only ever be missing a *description*, never missing a step.
+const NAV_DESCRIPTIONS: Record<string, string> = {
+  dashboard: "Your home base — see today's stats and recent activity at a glance.",
+  log: "Record today's sets, reps, and weight as you train.",
+  splits: "Build and manage the weekly training split you follow.",
+  exercises: "Browse the exercise library — each one has a 3D muscle diagram showing exactly what it targets.",
+  learn: "Research-backed guides on training, nutrition, sleep, supplements, and common beginner mistakes.",
+  progress: "Track your strength and volume over time.",
+  settings: "Update your goal, experience level, and preferred training days.",
+};
+
+const STEPS = NAV_ITEMS.map((item) => {
+  const key = item.href.slice(1);
+  return {
+    key,
+    title: item.label,
+    description: NAV_DESCRIPTIONS[key] ?? `See what's in ${item.label}.`,
+  };
+});
 
 function findVisibleTarget(key: string): HTMLElement | null {
   const candidates = document.querySelectorAll<HTMLElement>(`[data-tour="${key}"]`);
