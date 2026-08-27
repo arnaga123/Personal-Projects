@@ -82,7 +82,7 @@ export function ProductTour() {
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-label="Site tour">
       <div
-        className="fixed rounded-sm ring-2 ring-accent transition-all duration-200"
+        className="fixed rounded-sm ring-2 ring-accent transition duration-200"
         style={{
           top: rect.top - 4,
           left: rect.left - 4,

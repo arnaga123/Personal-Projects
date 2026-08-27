@@ -1,35 +1,60 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b0b0c;
-  --surface: #17181b;
-  --border: #2a2c31;
-  --foreground: #f4f4f1;
-  --muted: #9a9ca3;
-  --accent: #c6ff3a;
-  --accent-foreground: #0b0b0c;
-  --danger: #ff5c5c;
+  --background: #100e0a;
+  --surface: #1c1712;
+  --surface-hover: #241d16;
+  --border: #302820;
+  --foreground: #f6f1e8;
+  --muted: #ab9f8f;
+  --accent: #ffb340;
+  --accent-foreground: #1c1005;
+  --danger: #ff6152;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
   --color-border: var(--border);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-danger: var(--danger);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-geist);
   --font-display: var(--font-space-grotesk);
 }
 
 body {
-  background: var(--background);
+  /* A faint glow anchored to the top of the viewport instead of flat black
+     everywhere — fixed so it reads as one atmosphere behind the app rather
+     than repeating per page on scroll. */
+  background:
+    radial-gradient(ellipse 70% 45% at 50% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
 }
 
 ::selection {
   background: var(--accent);
   color: var(--accent-foreground);
+}
+
+html {
+  /* Dark-only app: without this, native controls (date picker, select
+     popups, scrollbars) render in light chrome regardless of our theme. */
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

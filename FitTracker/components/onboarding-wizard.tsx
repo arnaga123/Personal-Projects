@@ -54,7 +54,7 @@ export function OnboardingWizard({ name }: { name?: string }) {
                 setGoal(g.value);
                 setStep(1);
               }}
-              className="flex flex-col items-start gap-0.5 border border-border px-4 py-3 text-left transition-colors hover:border-accent"
+              className="flex flex-col items-start gap-0.5 rounded-lg border border-border px-4 py-3 text-left transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:bg-surface-hover hover:shadow-lg hover:shadow-black/20"
             >
               <span className="text-sm font-semibold">{g.label}</span>
               <span className="text-xs text-muted">{g.hint}</span>
@@ -73,7 +73,7 @@ export function OnboardingWizard({ name }: { name?: string }) {
                 setExperienceLevel(l.value);
                 setStep(2);
               }}
-              className="flex flex-col items-start gap-0.5 border border-border px-4 py-3 text-left transition-colors hover:border-accent"
+              className="flex flex-col items-start gap-0.5 rounded-lg border border-border px-4 py-3 text-left transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:bg-surface-hover hover:shadow-lg hover:shadow-black/20"
             >
               <span className="text-sm font-semibold">{l.label}</span>
               <span className="text-xs text-muted">{l.hint}</span>
@@ -94,10 +94,10 @@ export function OnboardingWizard({ name }: { name?: string }) {
                 type="button"
                 onClick={() => setDaysPerWeekPref(d)}
                 className={cn(
-                  "border border-border py-2.5 text-sm font-semibold transition-colors",
+                  "rounded-lg border border-border py-2.5 text-sm font-semibold transition duration-200",
                   daysPerWeekPref === d
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "hover:border-accent"
+                    ? "border-accent bg-accent text-accent-foreground shadow-[0_0_16px_-2px_rgba(255,179,64,0.5)]"
+                    : "hover:-translate-y-0.5 hover:border-accent"
                 )}
               >
                 {d}
@@ -106,7 +106,7 @@ export function OnboardingWizard({ name }: { name?: string }) {
           </div>
           {state?.error && <p className="text-sm text-danger">{state.error}</p>}
           <button type="submit" disabled={pending} className={buttonVariants("primary")}>
-            {pending ? "Setting up..." : "Get started"}
+            {pending ? "Setting up…" : "Get started"}
           </button>
         </form>
       )}

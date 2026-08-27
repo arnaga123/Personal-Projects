@@ -22,7 +22,7 @@ export function AddExerciseForm() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 border border-dashed border-border px-4 py-3 text-sm font-semibold uppercase tracking-wide text-muted transition-colors hover:border-accent hover:text-accent"
+        className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-3 text-sm font-semibold uppercase tracking-wide text-muted transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:text-accent"
       >
         <Plus size={16} /> Add exercise
       </button>
@@ -30,11 +30,16 @@ export function AddExerciseForm() {
   }
 
   return (
-    <form action={action} className="flex flex-col gap-5 border border-border bg-surface p-6">
+    <form action={action} className="flex flex-col gap-5 rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-lg font-medium">Add an exercise</h3>
-        <button type="button" onClick={() => setOpen(false)} className="text-muted hover:text-foreground">
-          <X size={18} />
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          aria-label="Close form"
+          className="text-muted hover:text-foreground"
+        >
+          <X size={18} aria-hidden="true" />
         </button>
       </div>
 
@@ -54,7 +59,7 @@ export function AddExerciseForm() {
               setMuscleGroup(next);
               setSecondary((prev) => prev.filter((g) => g !== next));
             }}
-            className="border border-border bg-background px-3.5 py-2.5 text-sm capitalize focus:border-accent focus:outline-none"
+            className="rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm capitalize focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
           >
             {MUSCLE_GROUPS.map((g) => (
               <option key={g} value={g}>
@@ -75,7 +80,7 @@ export function AddExerciseForm() {
           type="text"
           name="description"
           placeholder="One line on what this targets"
-          className="border border-border bg-background px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none"
+          className="rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
         />
       </label>
 
@@ -87,7 +92,7 @@ export function AddExerciseForm() {
           name="instructions"
           rows={3}
           placeholder="Step-by-step form cues"
-          className="border border-border bg-background px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none"
+          className="rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
         />
       </label>
 
@@ -102,7 +107,7 @@ export function AddExerciseForm() {
                 type="checkbox"
                 checked={secondary.includes(g)}
                 onChange={() => toggleSecondary(g)}
-                className="accent-[#c6ff3a]"
+                className="accent-[#ffb340]"
               />
               {g}
             </label>
@@ -113,7 +118,7 @@ export function AddExerciseForm() {
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
 
       <Button type="submit" disabled={pending} className="w-fit">
-        {pending ? "Adding..." : "Add exercise"}
+        {pending ? "Adding…" : "Add exercise"}
       </Button>
     </form>
   );

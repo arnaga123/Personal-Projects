@@ -18,8 +18,10 @@ export function MobileNav() {
             href={href}
             data-tour={href.slice(1)}
             className={cn(
-              "flex shrink-0 items-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide",
-              active ? "text-accent" : "text-muted"
+              "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide transition duration-200",
+              active
+                ? "bg-accent/10 text-accent shadow-[0_0_10px_-4px_var(--accent)]"
+                : "text-muted hover:bg-surface-hover hover:text-foreground"
             )}
           >
             <Icon size={16} strokeWidth={1.75} />

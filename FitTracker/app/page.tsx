@@ -54,10 +54,10 @@ export default function MarketingPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
           Built for the gym, not the boardroom
         </p>
-        <h1 className="mt-4 max-w-2xl font-display text-5xl font-medium leading-[1.05] tracking-tight md:text-6xl">
+        <h1 className="mt-4 max-w-2xl text-balance font-display text-5xl font-medium leading-[1.05] tracking-tight md:text-6xl">
           Log it. See it grow. Don&apos;t break the streak.
         </h1>
-        <p className="mt-6 max-w-xl text-base text-muted md:text-lg">
+        <p className="mt-6 max-w-[60ch] text-base text-muted md:text-lg">
           FitTracker turns every session into a graph, every split into a plan you&apos;ll actually
           follow, and every day you show up into a streak worth protecting.
         </p>
@@ -88,8 +88,13 @@ export default function MarketingPage() {
         </h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {FEATURES.map(({ icon: Icon, title, description }) => (
-            <div key={title} className="border border-border bg-surface p-6">
-              <Icon size={22} strokeWidth={1.75} className="text-accent" />
+            <div
+              key={title}
+              className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-accent/30"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
+                <Icon size={20} strokeWidth={1.75} aria-hidden="true" className="text-accent" />
+              </div>
               <h3 className="mt-4 font-display text-lg font-medium">{title}</h3>
               <p className="mt-2 text-sm text-muted">{description}</p>
             </div>

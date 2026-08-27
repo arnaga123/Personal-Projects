@@ -18,20 +18,20 @@ export function VolumeChart({ data }: { data: VolumePoint[] }) {
       <AreaChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
         <defs>
           <linearGradient id="volumeFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#c6ff3a" stopOpacity={0.35} />
-            <stop offset="100%" stopColor="#c6ff3a" stopOpacity={0} />
+            <stop offset="0%" stopColor="#ffb340" stopOpacity={0.35} />
+            <stop offset="100%" stopColor="#ffb340" stopOpacity={0} />
           </linearGradient>
         </defs>
         <XAxis
           dataKey="date"
-          stroke="#2a2c31"
-          tick={{ fill: "#9a9ca3", fontSize: 11 }}
+          stroke="#302820"
+          tick={{ fill: "#ab9f8f", fontSize: 11 }}
           tickLine={false}
-          axisLine={{ stroke: "#2a2c31" }}
+          axisLine={{ stroke: "#302820" }}
         />
         <YAxis
-          stroke="#2a2c31"
-          tick={{ fill: "#9a9ca3", fontSize: 11 }}
+          stroke="#302820"
+          tick={{ fill: "#ab9f8f", fontSize: 11 }}
           tickLine={false}
           axisLine={false}
           width={40}
@@ -40,7 +40,7 @@ export function VolumeChart({ data }: { data: VolumePoint[] }) {
         <Area
           type="monotone"
           dataKey="volume"
-          stroke="#c6ff3a"
+          stroke="#ffb340"
           strokeWidth={2}
           fill="url(#volumeFill)"
         />

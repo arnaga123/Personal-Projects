@@ -11,8 +11,10 @@ export function FilterPill({
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide capitalize transition-colors ${
-        active ? "bg-accent text-accent-foreground" : "border border-border text-muted hover:text-foreground"
+      className={`rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wide capitalize transition duration-200 active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+        active
+          ? "bg-accent text-accent-foreground shadow-[0_0_12px_-2px_rgba(255,179,64,0.5)]"
+          : "border border-border text-muted hover:-translate-y-0.5 hover:border-accent/50 hover:text-foreground"
       }`}
     >
       {label}

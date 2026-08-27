@@ -15,10 +15,10 @@ export default async function ProgressPage() {
     <div className="flex flex-col gap-10">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">Progress</p>
-        <h1 className="mt-1 font-display text-3xl font-medium">Body over time</h1>
+        <h1 className="mt-1 text-balance font-display text-3xl font-medium">Body over time</h1>
       </div>
 
-      <div className="border border-border bg-surface p-6">
+      <div className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20">
         <h2 className="font-display text-lg font-medium">Body weight</h2>
         <div className="mt-6 h-64">
           <WeightChart data={weightSeries} />
@@ -35,7 +35,7 @@ export default async function ProgressPage() {
                 key={m.id}
                 src={m.photo_url!}
                 alt={`Progress photo from ${m.date}`}
-                className="aspect-square w-full object-cover"
+                className="aspect-square w-full rounded-lg object-cover shadow-lg shadow-black/20 transition-transform duration-200 hover:-translate-y-1"
               />
             ))}
           </div>

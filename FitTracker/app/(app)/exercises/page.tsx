@@ -13,7 +13,7 @@ export default async function ExercisesPage() {
     <div className="flex flex-col gap-10">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">Exercises</p>
-        <h1 className="mt-1 font-display text-3xl font-medium">Exercise library</h1>
+        <h1 className="mt-1 text-balance font-display text-3xl font-medium">Exercise library</h1>
         <p className="mt-1 text-sm text-muted">
           Tap an exercise for form cues, rest time, and which muscles it hits.
         </p>
@@ -30,11 +30,13 @@ export default async function ExercisesPage() {
                 <Link
                   key={ex.id}
                   href={`/exercises/${ex.id}`}
-                  className="border border-border bg-surface p-4 transition-colors hover:border-accent"
+                  className="rounded-xl border border-border bg-surface p-4 transition duration-200 hover:-translate-y-1 hover:border-accent hover:shadow-xl hover:shadow-black/30"
                 >
-                  <p className="text-sm font-semibold">{ex.name}</p>
+                  <p className="line-clamp-2 text-sm font-semibold">{ex.name}</p>
                   {ex.equipment && <p className="mt-0.5 text-xs text-muted">{ex.equipment}</p>}
-                  {ex.description && <p className="mt-2 text-sm text-muted">{ex.description}</p>}
+                  {ex.description && (
+                    <p className="mt-2 line-clamp-3 text-sm text-muted">{ex.description}</p>
+                  )}
                 </Link>
               ))}
             </div>

@@ -1,3 +1,4 @@
+import { Flame, Dumbbell, Trophy, TrendingUp } from "lucide-react";
 import { verifySession } from "@/lib/dal";
 import { getDashboardData } from "@/lib/data/dashboard";
 import { StatTile } from "@/components/ui/stat-tile";
@@ -13,25 +14,30 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-10">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">Dashboard</p>
-        <h1 className="mt-1 font-display text-3xl font-medium">Your numbers</h1>
+        <h1 className="mt-1 text-balance font-display text-3xl font-medium">Your numbers</h1>
       </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatTile label="Current streak" value={streak} unit="days" accent />
-        <StatTile label="Workouts logged" value={totalWorkouts} />
-        <StatTile label="Top exercise" value={topExercise ?? "—"} />
-        <StatTile label="Last session volume" value={Math.round(volumeSeries.at(-1)?.volume ?? 0)} unit="lb" />
+        <StatTile label="Current streak" value={streak} unit="days" accent icon={Flame} />
+        <StatTile label="Workouts logged" value={totalWorkouts} icon={Dumbbell} />
+        <StatTile label="Top exercise" value={topExercise ?? "—"} icon={Trophy} />
+        <StatTile
+          label="Last session volume"
+          value={Math.round(volumeSeries.at(-1)?.volume ?? 0)}
+          unit="lb"
+          icon={TrendingUp}
+        />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="border border-border bg-surface p-6">
+        <div className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20 transition-colors duration-200 hover:border-accent/30">
           <h2 className="font-display text-lg font-medium">Volume over time</h2>
           <p className="mt-1 text-sm text-muted">Total reps × weight, per session.</p>
           <div className="mt-6 h-64">
             <VolumeChart data={volumeSeries} />
           </div>
         </div>
-        <div className="border border-border bg-surface p-6">
+        <div className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20 transition-colors duration-200 hover:border-accent/30">
           <h2 className="font-display text-lg font-medium">
             {topExercise ? `${topExercise} — top set` : "Strength over time"}
           </h2>
@@ -43,7 +49,7 @@ export default async function DashboardPage() {
       </div>
 
       {totalWorkouts === 0 && (
-        <div className="border border-dashed border-border p-8 text-center">
+        <div className="rounded-xl border border-dashed border-border p-8 text-center">
           <p className="text-sm text-muted">
             No workouts logged yet. Head to{" "}
             <a href="/log" className="text-accent underline underline-offset-4">

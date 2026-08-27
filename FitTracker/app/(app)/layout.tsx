@@ -16,7 +16,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-surface md:flex">
         <div className="border-b border-border px-6 py-6">
           <Link href="/dashboard" className="font-display text-xl font-semibold tracking-tight">
-            FIT<span className="text-accent">TRACKER</span>
+            FIT<span className="text-accent drop-shadow-[0_0_10px_rgba(255,179,64,0.5)]">TRACKER</span>
           </Link>
         </div>
         <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
@@ -27,7 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <div className="border-t border-border px-3 py-4">
           <p className="truncate px-3 text-xs text-muted">{name}</p>
           <form action={logout}>
-            <button className="mt-2 flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-muted transition-colors hover:text-danger">
+            <button className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted transition duration-200 hover:bg-danger/10 hover:text-danger">
               <LogOut size={18} strokeWidth={1.75} />
               Log out
             </button>

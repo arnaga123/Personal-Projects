@@ -8,7 +8,7 @@ export default async function LogPage() {
     <div className="flex flex-col gap-8">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">Log</p>
-        <h1 className="mt-1 font-display text-3xl font-medium">New workout</h1>
+        <h1 className="mt-1 text-balance font-display text-3xl font-medium">New workout</h1>
       </div>
 
       {exercises.length === 0 ? (

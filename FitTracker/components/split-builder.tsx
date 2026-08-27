@@ -36,6 +36,10 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
 
   const exerciseById = useMemo(() => new Map(exercises.map((e) => [e.id, e])), [exercises]);
 
+  const EXERCISE_LIST_CAP = 30;
+  const visibleExercises = filteredExercises.slice(0, EXERCISE_LIST_CAP);
+  const hiddenCount = filteredExercises.length - visibleExercises.length;
+
   function changeDaysPerWeek(next: number) {
     setDaysPerWeek(next);
     setDays((prev) => Array.from({ length: next }, (_, i) => prev[i] ?? emptyDay(i)));
@@ -69,7 +73,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
             name="name"
             required
             placeholder="Push Pull Legs"
-            className="border border-border bg-surface px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none"
+            className="rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
           />
         </label>
         <label className="flex flex-col gap-1.5">
@@ -79,7 +83,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
           <select
             value={daysPerWeek}
             onChange={(e) => changeDaysPerWeek(Number(e.target.value))}
-            className="border border-border bg-surface px-3.5 py-2.5 text-sm focus:border-accent focus:outline-none"
+            className="rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
           >
             {[1, 2, 3, 4, 5, 6, 7].map((n) => (
               <option key={n} value={n}>
@@ -90,7 +94,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
         </label>
       </div>
 
-      <div className="flex flex-col gap-3 border border-border bg-surface p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-lg shadow-black/20">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">
           Filter exercises for every day below
         </p>
@@ -98,14 +102,16 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
           <Search
             size={16}
             strokeWidth={1.75}
+            aria-hidden="true"
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
           />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search exercises..."
-            className="w-full border border-border bg-background py-2 pl-9 pr-3 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none"
+            placeholder="Search exercises…"
+            aria-label="Search exercises"
+            className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
           />
         </div>
         <div className="flex flex-wrap gap-2">
@@ -123,14 +129,15 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
 
       <div className="flex flex-col gap-4">
         {days.map((day, dayIndex) => (
-          <div key={dayIndex} className="border border-border bg-surface p-4">
+          <div key={dayIndex} className="rounded-xl border border-border bg-surface p-4 shadow-lg shadow-black/20">
             <input
               type="text"
               value={day.name}
               onChange={(e) =>
                 setDays((prev) => prev.map((d, i) => (i === dayIndex ? { ...d, name: e.target.value } : d)))
               }
-              className="mb-3 border-b border-border bg-transparent pb-2 text-sm font-semibold focus:border-accent focus:outline-none"
+              aria-label={`Day ${dayIndex + 1} name`}
+              className="mb-3 border-b border-border bg-transparent pb-2 text-sm font-semibold focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
             />
 
             {day.exerciseIds.length > 0 && (
@@ -148,21 +155,29 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
             {filteredExercises.length === 0 ? (
               <p className="text-sm text-muted">No exercises match your filter.</p>
             ) : (
-              <div className="grid max-h-48 grid-cols-2 gap-x-4 gap-y-1.5 overflow-y-auto sm:grid-cols-3">
-                {filteredExercises.map((ex) => (
-                  <label key={ex.id} className="flex items-center gap-2 text-sm text-muted">
-                    <input
-                      type="checkbox"
-                      checked={day.exerciseIds.includes(ex.id)}
-                      onChange={() => toggleExercise(dayIndex, ex.id)}
-                      className="accent-[#c6ff3a]"
-                    />
-                    <span className={day.exerciseIds.includes(ex.id) ? "text-foreground" : undefined}>
-                      {ex.name}
-                    </span>
-                  </label>
-                ))}
-              </div>
+              <>
+                <div className="grid max-h-48 grid-cols-2 gap-x-4 gap-y-1.5 overflow-y-auto sm:grid-cols-3">
+                  {visibleExercises.map((ex) => (
+                    <label key={ex.id} className="flex items-center gap-2 text-sm text-muted">
+                      <input
+                        type="checkbox"
+                        checked={day.exerciseIds.includes(ex.id)}
+                        onChange={() => toggleExercise(dayIndex, ex.id)}
+                        className="accent-[#ffb340]"
+                      />
+                      <span className={day.exerciseIds.includes(ex.id) ? "text-foreground" : undefined}>
+                        {ex.name}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {hiddenCount > 0 && (
+                  <p className="mt-2 text-xs text-muted">
+                    Showing {EXERCISE_LIST_CAP} of {filteredExercises.length} — refine your search or pick a
+                    muscle group to see the rest.
+                  </p>
+                )}
+              </>
             )}
           </div>
         ))}
@@ -171,7 +186,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
 
       <Button type="submit" disabled={pending} className="w-fit">
-        {pending ? "Saving..." : "Save split"}
+        {pending ? "Saving…" : "Save split"}
       </Button>
     </form>
   );

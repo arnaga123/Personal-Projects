@@ -5,6 +5,41 @@ import { Trash2 } from "lucide-react";
 import { deleteSplit } from "@/app/actions/splits";
 import { FilterPill } from "@/components/ui/filter-pill";
 
+function DeleteSplitControl({ splitId, splitName }: { splitId: string; splitName: string }) {
+  const [confirming, setConfirming] = useState(false);
+
+  if (confirming) {
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-danger">Delete?</span>
+        <form action={deleteSplit.bind(null, splitId)}>
+          <button type="submit" className="text-xs font-semibold text-danger hover:underline">
+            Yes
+          </button>
+        </form>
+        <button
+          type="button"
+          onClick={() => setConfirming(false)}
+          className="text-xs text-muted hover:text-foreground"
+        >
+          Cancel
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setConfirming(true)}
+      aria-label={`Delete ${splitName}`}
+      className="text-muted hover:text-danger"
+    >
+      <Trash2 size={16} aria-hidden="true" />
+    </button>
+  );
+}
+
 type SplitDayExercise = {
   order_index: number;
   exercises: { id: string; name: string; muscle_group: string } | null;
@@ -37,7 +72,10 @@ export function SplitsList({ splits }: { splits: Split[] }) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         {filtered.map((split) => (
-          <div key={split.id} className="border border-border bg-surface p-5">
+          <div
+            key={split.id}
+            className="rounded-xl border border-border bg-surface p-5 shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-accent/30"
+          >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="font-display text-lg font-medium">{split.name}</h3>
@@ -45,11 +83,7 @@ export function SplitsList({ splits }: { splits: Split[] }) {
                   {split.days_per_week} days / week
                 </p>
               </div>
-              <form action={deleteSplit.bind(null, split.id)}>
-                <button type="submit" className="text-muted hover:text-danger">
-                  <Trash2 size={16} />
-                </button>
-              </form>
+              <DeleteSplitControl splitId={split.id} splitName={split.name} />
             </div>
             <div className="mt-4 flex flex-col gap-3">
               {[...split.split_days]

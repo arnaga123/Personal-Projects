@@ -24,7 +24,7 @@ const BONE_COLOR = "#e2d6bd";
 // normal glance.
 const PRIMARY = "#ff2114";
 const SECONDARY = "#ff8f76";
-const BG = "#0b0a09";
+const BG = "#100e0a";
 
 // Tuned for the full head-to-feet figure (~1.64m tall after adding neck and
 // foot anatomy) at fov=30: target sits at mid-height, and the camera is far
@@ -503,26 +503,34 @@ export function BodyDiagram({
       : "Secondary";
 
   return (
-    <div className="flex flex-col gap-4 border border-border bg-surface p-6">
-      <div className="relative h-[440px] w-full overflow-hidden bg-black/40">
-        <Canvas
-          shadows={false}
-          dpr={[1, 2]}
-          camera={{ position: INITIAL_CAMERA_POSITION, fov: 30 }}
-          gl={{ antialias: true, toneMapping: THREE.NoToneMapping }}
+    <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20">
+      <div className="relative h-[440px] w-full overflow-hidden rounded-lg bg-black/40">
+        <div
+          role="img"
+          aria-label={`Interactive 3D body diagram highlighting the ${
+            specificMuscle ? SPECIFIC_MUSCLE_LABELS[specificMuscle] : primary
+          } muscle group. Drag to rotate or scroll to zoom.`}
+          className="absolute inset-0"
         >
-          <color attach="background" args={[BG]} />
-          <Scene
-            primary={primary}
-            secondary={secondary}
-            specificMuscle={specificMuscle}
-            specificSecondaryMuscles={specificSecondaryMuscles}
-            view={view}
-            onArrived={() => setView(null)}
-            focusPoint={focusPoint}
-            onSelectPoint={setFocusPoint}
-          />
-        </Canvas>
+          <Canvas
+            shadows={false}
+            dpr={[1, 2]}
+            camera={{ position: INITIAL_CAMERA_POSITION, fov: 30 }}
+            gl={{ antialias: true, toneMapping: THREE.NoToneMapping }}
+          >
+            <color attach="background" args={[BG]} />
+            <Scene
+              primary={primary}
+              secondary={secondary}
+              specificMuscle={specificMuscle}
+              specificSecondaryMuscles={specificSecondaryMuscles}
+              view={view}
+              onArrived={() => setView(null)}
+              focusPoint={focusPoint}
+              onSelectPoint={setFocusPoint}
+            />
+          </Canvas>
+        </div>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between p-3">
           <span className="pointer-events-none text-[10px] uppercase tracking-wide text-muted/70">

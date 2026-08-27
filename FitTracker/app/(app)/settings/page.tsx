@@ -11,7 +11,7 @@ export default async function SettingsPage() {
     <div className="flex flex-col gap-8">
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">Settings</p>
-        <h1 className="mt-1 font-display text-3xl font-medium">Your profile</h1>
+        <h1 className="mt-1 text-balance font-display text-3xl font-medium">Your profile</h1>
       </div>
       <ProfileForm profile={profile} />
       <div className="border-t border-border pt-6">
