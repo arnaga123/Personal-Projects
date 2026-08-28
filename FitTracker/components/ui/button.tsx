@@ -5,11 +5,15 @@ type ButtonVariant = "primary" | "secondary" | "ghost";
 
 export function buttonVariants(variant: ButtonVariant = "primary", className?: string) {
   return cn(
-    "inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold uppercase tracking-wide transition duration-200 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-    variant === "primary" &&
-      "bg-accent text-accent-foreground shadow-[0_0_0_0_rgba(255,179,64,0)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-4px_rgba(255,179,64,0.45)]",
+    // Nike button-primary/secondary: full pill, no radius scale — every CTA
+    // in the system is rounded-full. Press feedback is a scaled-down,
+    // dimmed "tap collapse" (toned down from the doc's literal scale(0.5)/
+    // opacity 0.5, which reads as broken rather than snappy on a wide
+    // desktop button).
+    "inline-flex items-center justify-center gap-2 rounded-full px-8 py-3 text-sm font-medium transition duration-150 active:scale-95 active:opacity-70 disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black/10 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    variant === "primary" && "bg-accent text-accent-foreground hover:opacity-90",
     variant === "secondary" &&
-      "border border-border text-foreground hover:-translate-y-0.5 hover:border-accent hover:text-accent hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.5)]",
+      "bg-surface text-foreground hover:bg-surface-hover",
     variant === "ghost" && "text-muted hover:text-foreground",
     className
   );

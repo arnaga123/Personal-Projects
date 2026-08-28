@@ -30,7 +30,7 @@ export default function SignupPage() {
         {state?.error && <p className="text-sm text-danger">{state.error}</p>}
         {state?.info && <p className="text-sm text-accent">{state.info}</p>}
         <Button type="submit" disabled={pending} className="mt-2">
-          {pending ? "Creating account..." : "Sign up"}
+          {pending ? "Creating account…" : "Sign up"}
         </Button>
       </form>
       <p className="mt-6 text-sm text-muted">

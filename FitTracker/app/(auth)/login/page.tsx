@@ -18,7 +18,7 @@ export default function LoginPage() {
         <Field label="Password" name="password" type="password" required autoComplete="current-password" />
         {state?.error && <p className="text-sm text-danger">{state.error}</p>}
         <Button type="submit" disabled={pending} className="mt-2">
-          {pending ? "Logging in..." : "Log in"}
+          {pending ? "Logging in…" : "Log in"}
         </Button>
       </form>
       <p className="mt-6 text-sm text-muted">

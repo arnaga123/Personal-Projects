@@ -30,7 +30,7 @@ export function BodyMetricForm() {
             type="file"
             name="photo"
             accept="image/*"
-            className="rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm text-muted file:mr-3 file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-xs file:font-semibold file:uppercase file:text-accent-foreground"
+            className="rounded-xl border border-transparent bg-surface px-4 py-2.5 text-sm text-muted file:mr-3 file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-xs file:font-medium file:uppercase file:text-accent-foreground"
           />
         </label>
       </div>

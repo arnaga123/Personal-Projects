@@ -18,7 +18,7 @@ export default function LearnPage() {
           <a
             key={category.id}
             href={`#${category.id}`}
-            className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-muted transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="rounded-full border border-border px-4 py-2 text-xs font-medium uppercase tracking-wide text-muted transition-colors duration-150 hover:bg-surface hover:text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-black/10 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             {category.title}
           </a>
@@ -33,13 +33,13 @@ export default function LearnPage() {
               {category.articles.map((article) => (
                 <article
                   key={article.id}
-                  className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20 transition-colors duration-200 hover:border-accent/30"
+                  className="bg-surface p-6"
                 >
                   <h3 className="text-balance font-display text-lg font-medium">{article.title}</h3>
                   <ul className="mt-4 flex flex-col gap-2.5">
                     {article.keyPoints.map((point, i) => (
                       <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed text-foreground/90">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent shadow-[0_0_6px_-1px_var(--accent)]" />
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                         <span>{point}</span>
                       </li>
                     ))}
@@ -47,7 +47,12 @@ export default function LearnPage() {
 
                   <details className="group mt-4 border-t border-border pt-4">
                     <summary className="flex cursor-pointer list-none items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted transition-colors duration-200 hover:text-accent [&::-webkit-details-marker]:hidden">
-                      <ChevronDown size={14} strokeWidth={2} className="transition-transform duration-200 group-open:rotate-180" />
+                      <ChevronDown
+                        size={14}
+                        strokeWidth={2}
+                        aria-hidden="true"
+                        className="transition-transform duration-200 group-open:rotate-180"
+                      />
                       Read the full explanation
                     </summary>
                     <div className="mt-3 flex max-w-[65ch] flex-col gap-3 text-sm leading-relaxed text-muted">

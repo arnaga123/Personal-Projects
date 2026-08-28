@@ -22,7 +22,7 @@ export function AddExerciseForm() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 rounded-lg border border-dashed border-border px-4 py-3 text-sm font-semibold uppercase tracking-wide text-muted transition duration-200 hover:-translate-y-0.5 hover:border-accent hover:text-accent"
+        className="flex items-center gap-2 border border-dashed border-border px-4 py-3 text-sm font-medium uppercase tracking-wide text-muted transition-colors duration-150 hover:border-accent hover:text-accent"
       >
         <Plus size={16} /> Add exercise
       </button>
@@ -30,7 +30,7 @@ export function AddExerciseForm() {
   }
 
   return (
-    <form action={action} className="flex flex-col gap-5 rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20">
+    <form action={action} className="flex flex-col gap-5 bg-surface p-6">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-lg font-medium">Add an exercise</h3>
         <button
@@ -46,7 +46,7 @@ export function AddExerciseForm() {
       <input type="hidden" name="secondaryMuscleGroups" value={JSON.stringify(secondary)} />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Name" name="name" required placeholder="Cable Pullover" />
+        <Field label="Name" name="name" required placeholder="Cable Pullover" className="bg-background" />
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold uppercase tracking-wide text-muted">
             Primary muscle group
@@ -59,7 +59,7 @@ export function AddExerciseForm() {
               setMuscleGroup(next);
               setSecondary((prev) => prev.filter((g) => g !== next));
             }}
-            className="rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm capitalize focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+            className="rounded-xl border border-transparent bg-background px-4 py-2.5 text-sm capitalize focus:border-accent focus:outline-none focus:ring-4 focus:ring-surface"
           >
             {MUSCLE_GROUPS.map((g) => (
               <option key={g} value={g}>
@@ -68,8 +68,8 @@ export function AddExerciseForm() {
             ))}
           </select>
         </label>
-        <Field label="Equipment (optional)" name="equipment" placeholder="Cable" />
-        <Field label="Rest time (seconds)" name="restSeconds" type="number" min={15} max={600} defaultValue={90} />
+        <Field label="Equipment (optional)" name="equipment" placeholder="Cable" className="bg-background" />
+        <Field label="Rest time (seconds)" name="restSeconds" type="number" min={15} max={600} defaultValue={90} className="bg-background" />
       </div>
 
       <label className="flex flex-col gap-1.5">
@@ -80,7 +80,7 @@ export function AddExerciseForm() {
           type="text"
           name="description"
           placeholder="One line on what this targets"
-          className="rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+          className="rounded-xl border border-transparent bg-background px-4 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:ring-4 focus:ring-surface"
         />
       </label>
 
@@ -92,7 +92,7 @@ export function AddExerciseForm() {
           name="instructions"
           rows={3}
           placeholder="Step-by-step form cues"
-          className="rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+          className="rounded-xl border border-transparent bg-background px-4 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:ring-4 focus:ring-surface"
         />
       </label>
 
@@ -107,7 +107,7 @@ export function AddExerciseForm() {
                 type="checkbox"
                 checked={secondary.includes(g)}
                 onChange={() => toggleSecondary(g)}
-                className="accent-[#ffb340]"
+                className="accent-[#8a5738]"
               />
               {g}
             </label>

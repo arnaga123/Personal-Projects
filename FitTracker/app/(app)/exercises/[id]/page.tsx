@@ -43,7 +43,7 @@ export default async function ExerciseDetailPage({ params }: { params: Promise<{
         />
 
         <div className="flex flex-col gap-6">
-          <div className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20">
+          <div className="bg-surface p-6">
             <h2 className="font-display text-lg font-medium">How to perform it</h2>
             <p className="mt-3 whitespace-pre-line text-sm text-muted">
               {exercise.instructions ?? "No instructions added yet."}
@@ -51,45 +51,45 @@ export default async function ExerciseDetailPage({ params }: { params: Promise<{
           </div>
 
           {exercise.common_mistakes && (
-            <div className="rounded-xl border border-danger/40 bg-surface p-6 shadow-lg shadow-black/20">
+            <div className="border-l-4 border-danger bg-surface p-6">
               <h2 className="font-display text-lg font-medium text-danger">Common mistakes to avoid</h2>
               <p className="mt-3 text-sm text-muted">{exercise.common_mistakes}</p>
             </div>
           )}
 
           {exercise.beginner_tips && (
-            <div className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20">
+            <div className="bg-surface p-6">
               <h2 className="font-display text-lg font-medium">Tips if you&apos;re new to this</h2>
               <p className="mt-3 text-sm text-muted">{exercise.beginner_tips}</p>
             </div>
           )}
 
           {exercise.why_effective && (
-            <div className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20">
+            <div className="bg-surface p-6">
               <h2 className="font-display text-lg font-medium">Why it&apos;s effective</h2>
               <p className="mt-3 text-sm text-muted">{exercise.why_effective}</p>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-xl border border-border bg-surface p-5 shadow-lg shadow-black/20">
+            <div className="bg-surface p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Primary muscle</p>
               <p className="mt-2 font-display text-xl font-medium capitalize text-accent">{primaryLabel}</p>
             </div>
-            <div className="rounded-xl border border-border bg-surface p-5 shadow-lg shadow-black/20">
+            <div className="bg-surface p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Rest between sets</p>
               <p className="mt-2 font-display text-xl font-medium">
                 {exercise.rest_seconds ? formatRest(exercise.rest_seconds) : "—"}
               </p>
             </div>
-            <div className="rounded-xl border border-border bg-surface p-5 shadow-lg shadow-black/20">
+            <div className="bg-surface p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Equipment needed</p>
               <p className="mt-2 font-display text-xl font-medium">{exercise.equipment ?? "None"}</p>
             </div>
           </div>
 
           {(specificSecondary.length > 0 || secondary.length > 0) && (
-            <div className="rounded-xl border border-border bg-surface p-5 shadow-lg shadow-black/20">
+            <div className="bg-surface p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">Secondary muscles</p>
               <p className="mt-2 text-sm capitalize text-foreground">
                 {specificSecondary.length > 0

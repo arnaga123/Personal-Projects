@@ -24,7 +24,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <select
           name="goal"
           defaultValue={profile?.goal ?? "maintain"}
-          className="rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+          className="rounded-xl border border-transparent bg-surface px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:bg-background focus:ring-4 focus:ring-surface"
         >
           <option value="bulk">Bulk</option>
           <option value="cut">Cut</option>
@@ -39,7 +39,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <select
           name="experienceLevel"
           defaultValue={profile?.experience_level ?? "beginner"}
-          className="rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+          className="rounded-xl border border-transparent bg-surface px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:bg-background focus:ring-4 focus:ring-surface"
         >
           <option value="beginner">Beginner</option>
           <option value="intermediate">Intermediate</option>
@@ -58,7 +58,7 @@ export function ProfileForm({ profile }: { profile: Profile }) {
       />
 
       {state?.error && <p className="text-sm text-danger">{state.error}</p>}
-      {state?.success && <p className="text-sm text-accent">Saved.</p>}
+      {state?.success && <p className="text-sm text-success">Saved.</p>}
 
       <Button type="submit" disabled={pending} className="w-fit">
         {pending ? "Saving…" : "Save changes"}

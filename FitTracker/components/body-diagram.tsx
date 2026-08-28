@@ -24,7 +24,7 @@ const BONE_COLOR = "#e2d6bd";
 // normal glance.
 const PRIMARY = "#ff2114";
 const SECONDARY = "#ff8f76";
-const BG = "#100e0a";
+const BG = "#1a140f";
 
 // Tuned for the full head-to-feet figure (~1.64m tall after adding neck and
 // foot anatomy) at fov=30: target sits at mid-height, and the camera is far
@@ -503,8 +503,8 @@ export function BodyDiagram({
       : "Secondary";
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20">
-      <div className="relative h-[440px] w-full overflow-hidden rounded-lg bg-black/40">
+    <div className="flex flex-col gap-4 bg-surface p-6">
+      <div className="relative h-[440px] w-full overflow-hidden bg-[#1a140f]">
         <div
           role="img"
           aria-label={`Interactive 3D body diagram highlighting the ${

@@ -73,7 +73,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
             name="name"
             required
             placeholder="Push Pull Legs"
-            className="rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+            className="rounded-xl border border-transparent bg-surface px-4 py-2.5 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:bg-background focus:ring-4 focus:ring-surface"
           />
         </label>
         <label className="flex flex-col gap-1.5">
@@ -83,7 +83,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
           <select
             value={daysPerWeek}
             onChange={(e) => changeDaysPerWeek(Number(e.target.value))}
-            className="rounded-lg border border-border bg-surface px-3.5 py-2.5 text-sm focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+            className="rounded-xl border border-transparent bg-surface px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:bg-background focus:ring-4 focus:ring-surface"
           >
             {[1, 2, 3, 4, 5, 6, 7].map((n) => (
               <option key={n} value={n}>
@@ -94,7 +94,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
         </label>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 shadow-lg shadow-black/20">
+      <div className="flex flex-col gap-3 bg-surface p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">
           Filter exercises for every day below
         </p>
@@ -111,7 +111,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search exercises…"
             aria-label="Search exercises"
-            className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+            className="w-full rounded-xl border border-transparent bg-background py-2.5 pl-9 pr-3 text-sm placeholder:text-muted/60 focus:border-accent focus:outline-none focus:ring-4 focus:ring-surface"
           />
         </div>
         <div className="flex flex-wrap gap-2">
@@ -129,7 +129,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
 
       <div className="flex flex-col gap-4">
         {days.map((day, dayIndex) => (
-          <div key={dayIndex} className="rounded-xl border border-border bg-surface p-4 shadow-lg shadow-black/20">
+          <div key={dayIndex} className="bg-surface p-4">
             <input
               type="text"
               value={day.name}
@@ -137,7 +137,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
                 setDays((prev) => prev.map((d, i) => (i === dayIndex ? { ...d, name: e.target.value } : d)))
               }
               aria-label={`Day ${dayIndex + 1} name`}
-              className="mb-3 border-b border-border bg-transparent pb-2 text-sm font-semibold focus:border-accent focus:outline-none focus:shadow-[0_0_0_3px_rgba(255,179,64,0.15)]"
+              className="mb-3 border-b border-border bg-transparent pb-2 text-sm font-medium focus:border-accent focus:outline-none"
             />
 
             {day.exerciseIds.length > 0 && (
@@ -163,7 +163,7 @@ export function SplitBuilder({ exercises }: { exercises: Exercise[] }) {
                         type="checkbox"
                         checked={day.exerciseIds.includes(ex.id)}
                         onChange={() => toggleExercise(dayIndex, ex.id)}
-                        className="accent-[#ffb340]"
+                        className="accent-[#8a5738]"
                       />
                       <span className={day.exerciseIds.includes(ex.id) ? "text-foreground" : undefined}>
                         {ex.name}

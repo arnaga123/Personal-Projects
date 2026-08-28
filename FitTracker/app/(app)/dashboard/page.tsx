@@ -30,14 +30,14 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20 transition-colors duration-200 hover:border-accent/30">
+        <div className="bg-surface p-6">
           <h2 className="font-display text-lg font-medium">Volume over time</h2>
           <p className="mt-1 text-sm text-muted">Total reps × weight, per session.</p>
           <div className="mt-6 h-64">
             <VolumeChart data={volumeSeries} />
           </div>
         </div>
-        <div className="rounded-xl border border-border bg-surface p-6 shadow-lg shadow-black/20 transition-colors duration-200 hover:border-accent/30">
+        <div className="bg-surface p-6">
           <h2 className="font-display text-lg font-medium">
             {topExercise ? `${topExercise} — top set` : "Strength over time"}
           </h2>
@@ -49,7 +49,7 @@ export default async function DashboardPage() {
       </div>
 
       {totalWorkouts === 0 && (
-        <div className="rounded-xl border border-dashed border-border p-8 text-center">
+        <div className="border border-dashed border-border p-8 text-center">
           <p className="text-sm text-muted">
             No workouts logged yet. Head to{" "}
             <a href="/log" className="text-accent underline underline-offset-4">

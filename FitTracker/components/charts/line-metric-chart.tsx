@@ -19,14 +19,14 @@ export function LineMetricChart({ data, emptyLabel }: { data: Point[]; emptyLabe
       <LineChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
         <XAxis
           dataKey="date"
-          stroke="#302820"
-          tick={{ fill: "#ab9f8f", fontSize: 11 }}
+          stroke="#ddd3c4"
+          tick={{ fill: "#6b5f4f", fontSize: 11 }}
           tickLine={false}
-          axisLine={{ stroke: "#302820" }}
+          axisLine={{ stroke: "#ddd3c4" }}
         />
         <YAxis
-          stroke="#302820"
-          tick={{ fill: "#ab9f8f", fontSize: 11 }}
+          stroke="#ddd3c4"
+          tick={{ fill: "#6b5f4f", fontSize: 11 }}
           tickLine={false}
           axisLine={false}
           width={40}
@@ -35,9 +35,9 @@ export function LineMetricChart({ data, emptyLabel }: { data: Point[]; emptyLabe
         <Line
           type="monotone"
           dataKey="value"
-          stroke="#ffb340"
+          stroke="#8a5738"
           strokeWidth={2}
-          dot={{ r: 3, fill: "#ffb340", strokeWidth: 0 }}
+          dot={{ r: 3, fill: "#8a5738", strokeWidth: 0 }}
         />
       </LineChart>
     </ResponsiveContainer>

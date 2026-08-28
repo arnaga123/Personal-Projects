@@ -30,7 +30,7 @@ export default async function ExercisesPage() {
                 <Link
                   key={ex.id}
                   href={`/exercises/${ex.id}`}
-                  className="rounded-xl border border-border bg-surface p-4 transition duration-200 hover:-translate-y-1 hover:border-accent hover:shadow-xl hover:shadow-black/30"
+                  className="border border-border bg-background p-4 transition-colors duration-150 hover:bg-surface"
                 >
                   <p className="line-clamp-2 text-sm font-semibold">{ex.name}</p>
                   {ex.equipment && <p className="mt-0.5 text-xs text-muted">{ex.equipment}</p>}

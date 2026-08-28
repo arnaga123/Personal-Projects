@@ -74,7 +74,7 @@ export function SplitsList({ splits }: { splits: Split[] }) {
         {filtered.map((split) => (
           <div
             key={split.id}
-            className="rounded-xl border border-border bg-surface p-5 shadow-lg shadow-black/20 transition duration-200 hover:-translate-y-0.5 hover:border-accent/30"
+            className="bg-surface p-5"
           >
             <div className="flex items-start justify-between gap-3">
               <div>

@@ -1,15 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #100e0a;
-  --surface: #1c1712;
-  --surface-hover: #241d16;
-  --border: #302820;
-  --foreground: #f6f1e8;
-  --muted: #ab9f8f;
-  --accent: #ffb340;
-  --accent-foreground: #1c1005;
-  --danger: #ff6152;
+  /* Warm Clay: warm cream + soft terracotta — replaces the harsher
+     black/white Nike palette after it read as too stark. Every text/bg
+     pairing below is checked against WCAG AA (4.5:1) at the values
+     actually used, not just the initial mockup swatch. */
+  --background: #f5f1ec;
+  --surface: #ece5db;
+  --surface-hover: #e3dbcc;
+  --border: #c9bca6;
+  --foreground: #3a332a;
+  --muted: #6b5f4f;
+  --accent: #8a5738;
+  --accent-foreground: #fdfbf8;
+  --danger: #a53321;
+  --danger-on-accent: #ffd6d2;
+  --success: #3f6142;
 }
 
 @theme inline {
@@ -22,18 +28,15 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-danger: var(--danger);
-  --font-sans: var(--font-geist);
-  --font-display: var(--font-space-grotesk);
+  --color-danger-on-accent: var(--danger-on-accent);
+  --color-success: var(--success);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-inter);
+  --font-hero: var(--font-bebas-neue);
 }
 
 body {
-  /* A faint glow anchored to the top of the viewport instead of flat black
-     everywhere — fixed so it reads as one atmosphere behind the app rather
-     than repeating per page on scroll. */
-  background:
-    radial-gradient(ellipse 70% 45% at 50% -10%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
-    var(--background);
-  background-attachment: fixed;
+  background: var(--background);
   color: var(--foreground);
 }
 
@@ -43,9 +46,7 @@ body {
 }
 
 html {
-  /* Dark-only app: without this, native controls (date picker, select
-     popups, scrollbars) render in light chrome regardless of our theme. */
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce) {

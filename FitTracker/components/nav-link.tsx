@@ -14,13 +14,15 @@ export function NavLink({ href, label, icon }: { href: string; label: string; ic
       href={href}
       data-tour={href.slice(1)}
       className={cn(
-        "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition duration-200",
+        // Nike's primary-nav marks the active section with a 2px ink
+        // underline and no background fill — rotated to a left border for
+        // our vertical sidebar since there's no direct "underline" axis.
+        "relative flex items-center gap-3 border-l-2 px-3 py-2.5 text-sm font-medium transition-colors duration-150",
         active
-          ? "bg-accent/10 text-foreground"
-          : "text-muted hover:translate-x-0.5 hover:bg-surface-hover hover:text-foreground"
+          ? "border-accent text-foreground"
+          : "border-transparent text-muted hover:bg-surface hover:text-foreground"
       )}
     >
-      {active && <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-accent shadow-[0_0_8px_var(--accent)]" />}
       {icon}
       {label}
     </Link>

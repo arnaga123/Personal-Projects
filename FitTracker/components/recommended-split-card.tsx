@@ -14,31 +14,33 @@ export function RecommendedSplitCard({ template }: { template: ResolvedSplitTemp
   }));
 
   return (
-    <form
-      action={action}
-      className="relative flex flex-col overflow-hidden rounded-xl border border-accent/30 bg-surface p-5 shadow-lg shadow-accent/5 transition duration-200 hover:-translate-y-0.5 hover:border-accent/60 hover:shadow-xl hover:shadow-accent/10"
-    >
-      <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-accent/10 blur-2xl" />
+    // Nike's own way to make one thing stand out in a monochrome system:
+    // invert to full ink black instead of a colored glow (member-benefit-card).
+    <form action={action} className="flex flex-col bg-accent p-5 text-accent-foreground">
       <input type="hidden" name="name" value={template.name} />
       <input type="hidden" name="daysPerWeek" value={template.daysPerWeek} />
       <input type="hidden" name="days" value={JSON.stringify(days)} />
 
-      <span className="relative w-fit rounded-full bg-accent/15 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-accent">
+      <span className="w-fit text-[10px] font-medium uppercase tracking-wide text-accent-foreground/70">
         Recommended for you
       </span>
-      <h3 className="relative mt-3 font-display text-lg font-medium">{template.name}</h3>
-      <p className="relative text-xs uppercase tracking-wide text-muted">{template.daysPerWeek} days / week</p>
+      <h3 className="mt-3 font-display text-lg font-medium">{template.name}</h3>
+      <p className="text-xs uppercase tracking-wide text-accent-foreground/70">
+        {template.daysPerWeek} days / week
+      </p>
 
       <div className="mt-4 flex flex-col gap-2">
         {template.days.map((day) => (
           <div key={day.name}>
-            <p className="text-sm font-semibold">{day.name}</p>
-            <p className="text-sm text-muted">{day.exercises.map((e) => e.name).join(", ")}</p>
+            <p className="text-sm font-medium">{day.name}</p>
+            <p className="text-sm text-accent-foreground/70">
+              {day.exercises.map((e) => e.name).join(", ")}
+            </p>
           </div>
         ))}
       </div>
 
-      {state?.error && <p className="mt-3 text-sm text-danger">{state.error}</p>}
+      {state?.error && <p className="mt-3 text-sm text-danger-on-accent">{state.error}</p>}
 
       <Button type="submit" variant="secondary" disabled={pending} className="mt-4 w-fit">
         {pending ? "Adding…" : "Use this split"}
